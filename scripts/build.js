@@ -1,5 +1,5 @@
 import minimist from "minimist"
-// import execa from 'execa'
+import { execa } from 'execa'
 import esbuild from "esbuild"
 import os from 'os'
 import path from "path"
@@ -22,7 +22,9 @@ function runParallel(target, task) {
 async function build (target) {
   const pkgDir = path.resolve( `packages/${target}`)
   const pkg = fs.readFileSync( `${pkgDir}/package.json`, 'utf-8')
-  console.log(pkg);
+  await execa('tsup', [], { stdio: 'inherit' })
 }
 
-build('request')
+execa('tsup', [],  { stdio: 'inherit' }).then(res => {
+  console.log(res);
+}).catch(res => console.log(res))
