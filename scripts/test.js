@@ -1,8 +1,3 @@
-import fs from 'fs'
+const process$1 = require('node:process');
 
-async function run () {
-  const res = await fs.readFileSync('node_modules/vue/package.json', 'utf-8')
-  console.log(JSON.parse(res).dependencies);
-}
-
-run()
+console.dir(process$1);

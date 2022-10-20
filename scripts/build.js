@@ -1,30 +1,29 @@
-import minimist from "minimist"
+// import minimist from "minimist"
 import { execa } from 'execa'
-import esbuild from "esbuild"
-import os from 'os'
-import path from "path"
-import fs from 'fs'
 
-const args = minimist(process.argv.slice(2))
+// import esbuild from "esbuild"
+// import os from 'os'
+// import path from "path"
+// import fs from 'fs'
 
-// if (args.length)
+// const args = minimist(process.argv.slice(2))
 
-function runParallel(target, task) {
-  const maxConcurrency = os.cpus().length
-  const executing  = []
-  const tasks = []
+// // if (args.length)
 
-  for (const item of target) {
-    const p = Promise.resolve().then(() => task(item))
-  }
-}
+// function runParallel(target, task) {
+//   const maxConcurrency = os.cpus().length
+//   const executing  = []
+//   const tasks = []
 
-async function build (target) {
-  const pkgDir = path.resolve( `packages/${target}`)
-  const pkg = fs.readFileSync( `${pkgDir}/package.json`, 'utf-8')
-  await execa('tsup', [], { stdio: 'inherit' })
-}
+//   for (const item of target) {
+//     const p = Promise.resolve().then(() => task(item))
+//   }
+// }
 
-execa('tsup', [],  { stdio: 'inherit' }).then(res => {
-  console.log(res);
-}).catch(res => console.log(res))
+// async function build (target) {
+//   const pkgDir = path.resolve( `packages/${target}`)
+//   const pkg = fs.readFileSync( `${pkgDir}/package.json`, 'utf-8')
+//   await execa('tsup', [], { stdio: 'inherit' })
+// }
+
+execa('npx rollup --config ./rollup.config.js --environment platform:wechat,xhs', [],  { stdio: 'inherit' })

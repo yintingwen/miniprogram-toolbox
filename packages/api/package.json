@@ -11,5 +11,8 @@
   "license": "ISC",
   "dependencies": {
     "@elf/shared": "workspace:1.0.1"
+  },
+  "buildConfig": {
+    "platform": ["wechat", "alipay", "douyin"]
   }
 }

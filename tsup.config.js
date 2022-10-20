@@ -5,5 +5,6 @@ export default defineConfig({
   outDir: './packages/api/dist',
   format: 'esm',
   targe: 'es2015',
-  dts: true
+  dts: true,
+  // external: ['@elf/shared'],
 })
