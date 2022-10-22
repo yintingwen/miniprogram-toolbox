@@ -5,9 +5,9 @@ export const createFailError = (e: any) => {
 }
 
 export async function promiseify  (api: string, params?: object, ...e: any[]): Promise<any> {
-    const targetApi = typeof api === 'string' ? platformApi[api] : api
+    const targetApi = typeof api === 'string' ? PLATFORM_API[api] : api
     return new Promise((resolve, reject) => {
-        targetApi.call(platformApi, {
+        targetApi.call(PLATFORM_API, {
             ...params,
             success: (e: any) => {
               if (e.errMsg.split(':')[1] === 'ok') {
@@ -23,7 +23,7 @@ export async function promiseify  (api: string, params?: object, ...e: any[]): P
 
 export async function getApiScope (auth: string) {
   promiseify('hideLoading')
-  const { confirm } = await promiseify(platform === 'alipay' ? 'confirm' : 'showModal', { title: '提示', content: '功能需要开启授权，是否前往设置页开启' })
+  const { confirm } = await promiseify(PLATFORM === 'alipay' ? 'confirm' : 'showModal', { title: '提示', content: '功能需要开启授权，是否前往设置页开启' })
   if ( !confirm ) return Promise.reject(new Error('model点击取消')) 
   const { authSetting } = await promiseify('openSetting')
   return authSetting[auth] ? Promise.resolve('授权成功') : Promise.reject(new Error('取消授权'))
@@ -31,7 +31,7 @@ export async function getApiScope (auth: string) {
 
 export async function call (api: string, params: object) {
   const scope = apiAuthMap[api]
-  if (scope && platform !== "red") {
+  if (scope && PLATFORM !== "xhs") {
     const { authSetting } = await promiseify('getSetting', { withSubscriptions: true })
     if (authSetting[scope] === false) {
       await getApiScope(scope)

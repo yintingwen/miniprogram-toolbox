@@ -1,2 +1,2 @@
-declare const platformApi: any
-declare const platform: any
+declare const PLATFORM_API: any
+declare const PLATFORM: any
