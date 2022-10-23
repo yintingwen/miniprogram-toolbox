@@ -71,9 +71,7 @@ function createBaseConfig (target) {
     },
     plugins: [
       createTypescript(target),
-      terser({
-        toplevel: true,
-      })
+      terser()
     ]
   }
 }
