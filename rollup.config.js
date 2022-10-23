@@ -1,55 +1,85 @@
 import typescript from 'rollup-plugin-typescript2';
 import replace from '@rollup/plugin-replace'
+import { terser } from 'rollup-plugin-terser';
 import fs from 'fs'
+import path from 'path'
 
 const rollupConfig = []
 const target = process.env.TARGET
-const pkgDir = `./packages/${target}`
-const pkg = JSON.parse(fs.readFileSync(`./${pkgDir}/package.json`, 'utf-8'))
-const { buildConfig } = pkg
+const pkgDir = path.resolve(`packages/${target}`)
+const pkg = path.resolve(pkgDir, 'package.json')
+const targetPkg = JSON.parse(fs.readFileSync(pkg, 'utf-8'))
+const buildConfig = targetPkg.buildConfig || {}
+const platforms = (buildConfig.platforms && buildConfig.platforms.length) ? buildConfig.platforms : ['js']
+Reflect.deleteProperty(targetPkg, 'buildConfig')
 
-buildConfig.platforms.forEach(platform => { 
-  const config = createConfig(target, platform)
-  rollupConfig.push(config)
-  const libPkg = { 
-    ...pkg,
-    main: `dist/index.js`, 
-    module: `dist/index.js`, 
-    types: `dist/index.d.ts`, 
-    name: `@elf/${target}-${platform}` 
+platforms.forEach(platform => { 
+  const libName = getLibName(target, platform)
+  const libPkg = createPkg(libName)
+  const config = createBaseConfig(target)
+  if (platform === 'js') {
+    config.output.file = `./libs/${target}/index.js`
+  } else {
+    config.output.file = `./libs/${libName}/index.js`
+    config.plugins.splice(1, 0, createReplace(platform))
   }
-  Reflect.deleteProperty(libPkg, 'buildConfig')
-  fs.mkdirSync(`./libs/${target}-${platform}`, { recursive: true })
-  fs.writeFileSync(`./libs/${target}-${platform}/package.json`, JSON.stringify(libPkg, null, 2))
+  rollupConfig.push(config)
+  fs.mkdirSync(`./libs/${libName}`, { recursive: true })
+  fs.writeFileSync(`./libs/${libName}/package.json`, JSON.stringify(libPkg, null, 2))
 })
 
-function createConfig (target, platform) {
+function createTypescript (target) {
+  return typescript({
+    tsconfig: 'tsconfig.json',
+    tsconfigOverride: {
+      include: [
+        `types/**/*`,
+        `packages/${target}/**/*`
+      ],
+    }
+  })
+}
+
+function createReplace (platform) {
+  return replace({
+    preventAssignment: true,
+    values: {
+      'PLATFORM_API': platform,
+      'PLATFORM': JSON.stringify(platform)
+    }
+  })
+}
+
+function createPkg (name) {
+  const libPkg = { 
+    ...targetPkg,
+    main: `index.js`, 
+    module: `index.js`, 
+    types: `index.d.ts`, 
+    name: `@elf/${name}` 
+  }
+
+  return libPkg
+}
+
+function createBaseConfig (target) {
   return {
-    input: './packages/api/src/index.ts',
+    input: path.resolve(pkgDir, 'src/index.ts'),
     output: {
-      dir: `./libs/${target}-${platform}/dist`,
       format: 'esm',
       sourcemap: true,
     },
     plugins: [
-      typescript({
-        tsconfig: './tsconfig.json',
-        tsconfigOverride: {
-          include: [
-            `shared/**/*`,
-            `packages/${target}/**/*`
-          ],
-        }
-      }),
-      replace({
-        preventAssignment: true,
-        values: {
-          'PLATFORM_API': 'my',
-          'PLATFORM': JSON.stringify('alipay')
-        }
+      createTypescript(target),
+      terser({
+        toplevel: true,
       })
     ]
   }
+}
+
+function getLibName (target, platform) {
+  return platform === 'js' ? target : `${target}-${platform}`
 }
 
 export default rollupConfig

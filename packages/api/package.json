@@ -1,5 +1,5 @@
 {
-  "name": "@elf/api",
+  "name": "api",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -9,10 +9,12 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "@elf/shared": "workspace:1.0.1"
-  },
   "buildConfig": {
-    "platforms": ["wx", "my", "tt"]
+    "platforms": [
+      "wx",
+      "my",
+      "tt",
+      "xhs"
+    ]
   }
 }
