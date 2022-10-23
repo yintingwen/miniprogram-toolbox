@@ -3,6 +3,7 @@ import replace from '@rollup/plugin-replace'
 import { terser } from 'rollup-plugin-terser';
 import fs from 'fs'
 import path from 'path'
+import config from './config.js'
 
 const rollupConfig = []
 const target = process.env.TARGET
@@ -18,9 +19,9 @@ platforms.forEach(platform => {
   const libPkg = createPkg(libName)
   const config = createBaseConfig(target)
   if (platform === 'js') {
-    config.output.file = `./libs/${target}/index.js`
+    config.output.file = `./libs/${target}/dist/index.js`
   } else {
-    config.output.file = `./libs/${libName}/index.js`
+    config.output.file = `./libs/${libName}/dist/index.js`
     config.plugins.splice(1, 0, createReplace(platform))
   }
   rollupConfig.push(config)
@@ -53,10 +54,10 @@ function createReplace (platform) {
 function createPkg (name) {
   const libPkg = { 
     ...targetPkg,
-    main: `index.js`, 
-    module: `index.js`, 
-    types: `index.d.ts`, 
-    name: `@elf/${name}` 
+    main: `dist/index.js`, 
+    module: `dist/index.js`, 
+    types: `dist/index.d.ts`, 
+    name: config.organization ? `@${config.organization}/${name}` : name
   }
 
   return libPkg
