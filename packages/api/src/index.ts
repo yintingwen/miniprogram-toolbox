@@ -1,4 +1,8 @@
-const apiAuthMap: any = {}
+const apiScopeMap: Record<string, string> = {}
+
+export function registerApiScope (e: Record<string, string>) {
+  Object.assign(apiScopeMap, e)
+}
 
 export const createFailError = (e: any) => {
   return { ...e, message: e.errMsg }
@@ -30,7 +34,7 @@ export async function getApiScope (auth: string) {
 }
 
 export async function call (api: string, params: object) {
-  const scope = apiAuthMap[api]
+  const scope = apiScopeMap[api]
   if (scope && PLATFORM !== "xhs") {
     const { authSetting } = await promiseify('getSetting', { withSubscriptions: true })
     if (authSetting[scope] === false) {

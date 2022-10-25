@@ -5,16 +5,19 @@ import minimist from 'minimist'
 const args = minimist(process.argv.slice(2))
 const targets = args._
 const watch = args.w
+const example = args.e
 
 async function run () {
-  console.log('build start')
   const tasks = targets.map(item => 
     execa('rollup' , 
       [
         '-c', 
-        watch && '-w',
+        (example || watch) && '-w',
         '--environment',
-        `TARGET:${item}`,
+        [
+          `PACKAGE:${item}`,
+          example && `EXAMPLE:${example}`
+        ].filter(Boolean)
       ].filter(Boolean), 
       { stdio: 'inherit' }
     )
