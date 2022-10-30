@@ -1,0 +1,31 @@
+{
+  "name": "@ytw-sprite/authorize",
+  "version": "1.0.2",
+  "description": "",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "node ./scripts/postinstall.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "files": [
+    "dist",
+    "scripts"
+  ],
+  "buildConfig": {
+    "platforms": [
+      "wx",
+      "tt",
+      "my",
+      "xhs",
+      "js"
+    ]
+  },
+  "dependencies": {
+    "rimraf": "^3.0.2"
+  }
+}

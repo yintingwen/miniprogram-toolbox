@@ -8,7 +8,7 @@ export const createFailError = (e: any) => {
   return { ...e, message: e.errMsg }
 }
 
-export async function promiseify  (api: string, params?: object, ...e: any[]): Promise<any> {
+export async function promiseify  (api: keyof typeof PLATFORM_API, params?: object, ...e: any[]): Promise<any> {
     const targetApi = typeof api === 'string' ? PLATFORM_API[api] : api
     return new Promise((resolve, reject) => {
         targetApi.call(PLATFORM_API, {
@@ -33,7 +33,7 @@ export async function getApiScope (auth: string) {
   return authSetting[auth] ? Promise.resolve('授权成功') : Promise.reject(new Error('取消授权'))
 }
 
-export async function call (api: string, params: object) {
+export async function call (api: keyof typeof PLATFORM_API, params: object) {
   const scope = apiScopeMap[api]
   if (scope && PLATFORM !== "xhs") {
     const { authSetting } = await promiseify('getSetting', { withSubscriptions: true })

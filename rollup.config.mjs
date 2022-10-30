@@ -3,39 +3,44 @@ import replace from '@rollup/plugin-replace'
 import { terser } from 'rollup-plugin-terser';
 import resolve from '@rollup/plugin-node-resolve'
 import fs from 'fs'
-import path from 'path'
-import config from './config.js'
+import path, { join } from 'path'
+import rimraf from 'rimraf';
+import { getPlatforms } from './utils/buildConfig.mjs'
+import { insertPostinstall } from './utils/script.mjs';
 
 const rollupConfig = []
 const packege = process.env.PACKAGE
 const example = process.env.EXAMPLE
 
-const pkgDir = path.resolve(`packages/${packege}`)
-const pkg = path.resolve(pkgDir, 'package.json')
+const pkgDir = path.resolve(`./packages/${packege}`) // 目标目录
+const pkg = path.resolve(pkgDir, 'package.json') // 目标package.json路径
 const targetPkg = JSON.parse(fs.readFileSync(pkg, 'utf-8'))
-const buildConfig = targetPkg.buildConfig || {}
-const platforms = getPlatforms()
+const platforms = getPlatforms(targetPkg, example)
+const isMmultiple = platforms.length > 1
+rimraf(join(pkgDir, 'dist'), () => {})
 
-Reflect.deleteProperty(targetPkg, 'buildConfig')
+if (isMmultiple) {
+  insertPostinstall(packege)
+}
+
 platforms.forEach(platform => { 
-  const libName = getLibName(packege, platform)
-  const libPkg = createPkg(libName)
   const config = createBaseConfig(packege)
 
-  if (example) {
+  if (example) { // 示例开发
     config.output.file = `./examples/${example}/libs/${packege}/index.js`
+    config.output.sourcemap = true
     config.plugins.splice(1, 0, createReplace(platform))
     config.plugins.push(createResolve())
-  } else if ( platform === 'js' ) {
-    config.output.file = `./libs/${packege}/dist/index.js`
-  } else {
-    config.output.file = `./libs/${libName}/dist/index.js`
+  } else { // 打包
+    if (isMmultiple) { // 打包多平台
+      config.output.file =  path.resolve(pkgDir, 'dist', platform, 'index.js')
+    } else { // 打包单个
+      config.output.file =  path.resolve(pkgDir, 'dist', 'index.js')
+    }
     config.plugins.splice(1, 0, createReplace(platform))
   }
 
   rollupConfig.push(config)
-  fs.mkdirSync(`./libs/${libName}`, { recursive: true })
-  fs.writeFileSync(`./libs/${libName}/package.json`, JSON.stringify(libPkg, null, 2))
 })
 
 function createTypescript (packege) {
@@ -65,43 +70,17 @@ function createReplace (platform) {
   })
 }
 
-function createPkg (name) {
-  const libPkg = { 
-    ...targetPkg,
-    main: `dist/index.js`, 
-    module: `dist/index.js`, 
-    types: `dist/index.d.ts`, 
-    name: config.organization ? `@${config.organization}/${name}` : name
-  }
-
-  return libPkg
-}
-
 function createBaseConfig (packege) {
   return {
     input: path.resolve(pkgDir, 'src/index.ts'),
     output: {
       format: 'esm',
-      sourcemap: true,
+      sourcemap: false
     },
     plugins: [
       createTypescript(packege),
       terser()
     ]
-  }
-}
-
-function getLibName (packege, platform) {
-  return platform === 'js' ? packege : `${packege}-${platform}`
-}
-
-function getPlatforms () {
-  console.log(example);
-  if (example) {
-    return [example]
-  } else {
-    const { platforms } = buildConfig
-    return (platforms && platforms.length) ? platforms : ['js']
   }
 }
 
