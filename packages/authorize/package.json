@@ -1,6 +1,6 @@
 {
-  "name": "@ytw-sprite/authorize",
-  "version": "1.0.3",
+  "name": "@unmp/authorize",
+  "version": "1.0.1",
   "description": "",
   "main": "dist/index.js",
   "module": "dist/index.js",
