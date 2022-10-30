@@ -3,6 +3,7 @@
   "description": "",
   "main": "index.js",
   "type": "commonjs",
+  "private": true,
   "scripts": {
     "build": "node ./scripts/build.mjs",
     "test": "echo \"Error: no test specified\" && exit 1"
