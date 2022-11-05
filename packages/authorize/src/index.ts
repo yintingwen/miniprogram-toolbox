@@ -1,6 +1,6 @@
 const apiScopeMap: Record<string, string> = {}
 
-export function registerApiScope (e: Record<string, string>) {
+export function registerApiScope (e: Record<keyof typeof PLATFORM_API, string>) {
   Object.assign(apiScopeMap, e)
 }
 

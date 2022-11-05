@@ -27,4 +27,12 @@ export default class PackageJson {
   save () {
     writeFile(this.path, JSON.stringify(this.content, null, 2), 'utf-8', () => {})
   }
+
+  get (key) {
+    return this.content[key]
+  }
+
+  set (key, value) {
+    this.content[key] = value
+  }
 }

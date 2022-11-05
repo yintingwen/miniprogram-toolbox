@@ -30,7 +30,9 @@ platforms.forEach(platform => {
 })
 rollupConfig.push(createScriptConfig(packege))
 
-pkg.content.miniprogram = 'dist'
+if (pkg.get('miniprogram') !== 'dist') {
+  pkg.set('miniprogram', 'dist')
+}
 pkg.insertScript('postinstall', 'node ./scripts/postinstall.js')
 pkg.save()
 
