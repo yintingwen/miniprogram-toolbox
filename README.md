@@ -1,33 +1,23 @@
-# 小程序工具库
+# unmp
+是一个小程序跨平台工具库，同时也是小程序跨平台工具的开发脚手架，可以开发一份代码打包后适配多端小程序
 
-多端小程序工具库开发框架，可以开发一份代码同时打包多端小程序
+打包会根据配置同时生成多端的代码，在小程序 install 时，会自动判断所在平台并删除其他多余的代码
 
 ## 目录划分
 ```
 |-- packages：模板源码放置的地方
-|-- libs：打包后代码放置的地方
-|-- config.js 脚手架打包配置
+|----- dist：打包后的目录，不同小程序会放在对应目录下
+|-- scripts: 脚本文件
 ```
 
 ## 单个包的配置
 配置写在package.json的buildOption中
 ``` typescript
 interface BuileOptions {
-  platforms: ['wx', 'tt', 'my', 'xhs', 'js'],
-  name: "string"
+  platforms: ['wx', 'tt', 'my', 'xhs', 'js']
 }
 ```
 platforms: 默认js，该包需要打包的平台，打包后的包会默认添加平添后缀（js除外），js不限制小程序平台</br>
-name: 指定模板打包后生成的报名，默认采用的目录名
-
-## config.js
-``` typescript
-interface GlobalConfigOptions {
-  organization: string
-}
-```
-organization：组织名，填入后打包的name都会自动添加组织前缀
-
 
 ## 启动命令
 ``` bash
