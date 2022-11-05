@@ -2,26 +2,16 @@ import typescript from 'rollup-plugin-typescript2';
 import replace from '@rollup/plugin-replace'
 import { terser } from 'rollup-plugin-terser';
 import resolve from '@rollup/plugin-node-resolve'
-import fs from 'fs'
-import path, { join } from 'path'
-import rimraf from 'rimraf';
-import { getPlatforms } from './utils/buildConfig.mjs'
-import { insertPostinstall } from './utils/script.mjs';
+import path from 'path'
+import PackageJson from './utils/PackageJson.mjs'
 
 const rollupConfig = []
 const packege = process.env.PACKAGE
 const example = process.env.EXAMPLE
 
 const pkgDir = path.resolve(`./packages/${packege}`) // 目标目录
-const pkg = path.resolve(pkgDir, 'package.json') // 目标package.json路径
-const targetPkg = JSON.parse(fs.readFileSync(pkg, 'utf-8'))
-const platforms = getPlatforms(targetPkg, example)
-const isMmultiple = platforms.length > 1
-rimraf(join(pkgDir, 'dist'), () => {})
-
-if (isMmultiple) {
-  insertPostinstall(packege)
-}
+const pkg = new PackageJson(packege)
+const platforms = example ? [example] : pkg.getPlatforms()
 
 platforms.forEach(platform => { 
   const config = createBaseConfig(packege)
@@ -32,16 +22,26 @@ platforms.forEach(platform => {
     config.plugins.splice(1, 0, createReplace(platform))
     config.plugins.push(createResolve())
   } else { // 打包
-    if (isMmultiple) { // 打包多平台
-      config.output.file =  path.resolve(pkgDir, 'dist', platform, 'index.js')
-    } else { // 打包单个
-      config.output.file =  path.resolve(pkgDir, 'dist', 'index.js')
-    }
+    config.output.file =  path.resolve(pkgDir, 'dist', platform, 'index.js')
     config.plugins.splice(1, 0, createReplace(platform))
   }
 
   rollupConfig.push(config)
 })
+rollupConfig.push(createScriptConfig(packege))
+
+pkg.content.miniprogram = 'dist'
+pkg.insertScript('postinstall', 'node ./scripts/postinstall.js')
+pkg.save()
+
+
+function createScriptConfig (target) {
+  const config = createBaseConfig(target)
+  config.input = path.resolve('shared/postinstall.js')
+  config.output.file =  path.join(pkgDir, 'scripts/postinstall.js')
+  config.plugins.shift()
+  return config
+}
 
 function createTypescript (packege) {
   return typescript({
@@ -58,7 +58,6 @@ function createTypescript (packege) {
 function createResolve () {
   return resolve()
 }
-
 
 function createReplace (platform) {
   return replace({

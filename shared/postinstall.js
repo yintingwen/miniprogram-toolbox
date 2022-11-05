@@ -1,6 +1,5 @@
-const { readdirSync, readFileSync, writeFileSync, existsSync } = require('fs')
+const { readdirSync, readFileSync, writeFileSync, existsSync, unlinkSync, rmdirSync } = require('fs')
 const { resolve, join } = require('path')
-const rimraf = require('rimraf')
 
 const projectDir = __dirname.split('node_modules')[0] // 项目目录
 const projectPkg =  require(join(projectDir, 'package.json')) 
@@ -21,8 +20,8 @@ packageFiles.forEach((file) => {
   const fileContent = readFileSync(filePath, 'utf-8')
   writeFileSync(join(disDir, file), fileContent, 'utf-8')
 })
-platforms.forEach(package => {
-  rimraf(join(disDir, package), () => {})
+platforms.forEach((target) => {
+  clear(target)
 })
 
 function getPlatform () {
@@ -30,4 +29,13 @@ function getPlatform () {
   const cssPlatform = ['wx', 'tt', 'my', 'xhs']
   const cssIndex = css.findIndex(item =>  existsSync(join(projectDir, `app.${item}`)))
   return cssPlatform[cssIndex] || projectPkg.platform
+}
+
+function clear (target) {
+  const dir = resolve(`dist/${target}`)
+  const files = readdirSync(dir)
+  files.forEach((file) => {
+    unlinkSync(join(dir, file))
+  })
+  rmdirSync(dir)
 }
