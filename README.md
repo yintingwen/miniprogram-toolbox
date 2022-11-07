@@ -3,6 +3,12 @@
 
 打包会根据配置同时生成多端的代码，在小程序 install 时，会自动判断所在平台并删除其他多余的代码
 
+## 安装
+``` bash
+npm i @unmp/package_name
+```
+注意：所有包都会自动识别所在平台，也可以通过package.json中添加platform字段去手动指定
+
 ## 目录划分
 ```
 |-- packages：模板源码放置的地方
