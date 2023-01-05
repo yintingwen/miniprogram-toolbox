@@ -24,10 +24,9 @@ platforms.forEach(platform => {
     config.plugins.push(createResolve())
   } else { // 打包
     config.output.file =  path.resolve(pkgDir, 'dist', platform, 'index.js')
-    config.plugins.splice(1, 0, createReplace(platform))
-    config.plugins.unshift(condition({
-      platform
-    }))
+    config.plugins.splice(1, 0, condition({ platform }))
+    config.plugins.splice(2, 0, createReplace(platform))
+
   }
 
   rollupConfig.push(config)
