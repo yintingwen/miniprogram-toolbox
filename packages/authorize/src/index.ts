@@ -1,8 +1,10 @@
 const apiScopeMap: Record<string, string> = {}
 
+// #ifdef wx
 export function registerApiScope (e: Record<keyof typeof PLATFORM_API, string>) {
   Object.assign(apiScopeMap, e)
 }
+// #endif
 
 export const createFailError = (e: any) => {
   return { ...e, message: e.errMsg }

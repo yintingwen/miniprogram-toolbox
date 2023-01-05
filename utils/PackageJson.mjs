@@ -1,10 +1,6 @@
 import { readFileSync, writeFile } from "fs"
 import { resolve } from "path"
 
-export function writePackageJson (pkg, target) {
-  writeFile(join('packages', target, 'package.json'), JSON.stringify(pkg, null, 2), 'utf-8', () => {})
-}
-
 export default class PackageJson {
   path = ''
   content = {}
