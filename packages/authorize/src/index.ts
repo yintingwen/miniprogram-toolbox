@@ -1,6 +1,6 @@
 const apiScopeMap: Record<string, string> = {}
 
-// #ifdef wx
+// #ifdef xhs || wx
 export function registerApiScope (e: Record<keyof typeof PLATFORM_API, string>) {
   Object.assign(apiScopeMap, e)
 }
@@ -34,7 +34,7 @@ export async function getApiScope (auth: string) {
   const { authSetting } = await promiseify('openSetting')
   return authSetting[auth] ? Promise.resolve('授权成功') : Promise.reject(new Error('取消授权'))
 }
-
+// #ifndef xhs || wx
 export async function call (api: keyof typeof PLATFORM_API, params: object) {
   const scope = apiScopeMap[api]
   if (scope && PLATFORM !== "xhs") {
@@ -45,3 +45,4 @@ export async function call (api: keyof typeof PLATFORM_API, params: object) {
   }
   return promiseify(api, params)
 }
+// #endif
