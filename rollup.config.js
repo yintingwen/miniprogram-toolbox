@@ -3,8 +3,8 @@ import replace from '@rollup/plugin-replace'
 import { terser } from 'rollup-plugin-terser';
 import resolve from '@rollup/plugin-node-resolve'
 import path from 'path'
-import PackageJson from './utils/PackageJson.mjs'
-import condition from './plugins/condition.mjs'
+import PackageJson from './utils/PackageJson.js'
+import conditionCompile from 'unplugin-condition-compile'
 
 const rollupConfig = []
 const packege = process.env.PACKAGE
@@ -24,7 +24,7 @@ platforms.forEach(platform => {
     config.plugins.push(createResolve())
   } else { // 打包
     config.output.file =  path.resolve(pkgDir, 'dist', platform, 'index.js')
-    config.plugins.splice(1, 0, condition({ platform }))
+    config.plugins.splice(1, 0, conditionCompile .rollup({ target: platform }))
     config.plugins.splice(2, 0, createReplace(platform))
 
   }

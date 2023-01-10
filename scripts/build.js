@@ -34,7 +34,7 @@ async function build (target) {
     ].filter(Boolean), 
     { stdio: 'inherit' }
   )
-  const { stdout } = await execa(`node ./scripts/typeFix.mjs ${target}`)
+  const { stdout } = await execa(`node ./scripts/typeFix.js ${target}`)
   console.log(stdout);
 }
 
