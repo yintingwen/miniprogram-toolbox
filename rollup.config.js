@@ -24,7 +24,7 @@ platforms.forEach(platform => {
     config.plugins.push(createResolve())
   } else { // 打包
     config.output.file =  path.resolve(pkgDir, 'dist', platform, 'index.js')
-    config.plugins.splice(1, 0, conditionCompile .rollup({ target: platform }))
+    config.plugins.splice(1, 0, conditionCompile.rollup({target: platform} ))
     config.plugins.splice(2, 0, createReplace(platform))
 
   }
